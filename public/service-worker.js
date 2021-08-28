@@ -1,4 +1,4 @@
-const cacheName = 'weatherApp';
+const cacheName = 'cameraApp';
 
 // Cache all files in order to create the PWA
 self.addEventListener('install', e => {
@@ -12,11 +12,10 @@ self.addEventListener('install', e => {
                 './controllers/routes.js',
                 './images/apple-touch.png',
                 './images/splash-screen.png',
-                './scripts/script.js',
+                './scripts/camera.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',
-                './views/home.handlebars',
-                './views/result.handlebars',
+                './views/home.handlebars'
             ]);
         })
     );

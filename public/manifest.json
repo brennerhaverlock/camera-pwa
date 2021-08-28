@@ -1,7 +1,7 @@
 {
-    "name": "Weather App PWA",
-    "short_name": "Weather App",
-    "description": "A weather app that can run offline maybe?",
+    "name": "Camera App PWA",
+    "short_name": "Camera App",
+    "description": "A camera app that can run offline maybe?",
     "icons": [
         {
             "src": "/images/splash-screen.png",
@@ -11,7 +11,6 @@
         }
     ],
     "start_url": "/",
-    "display": "fullscreen",
     "theme_color": "#764ABC",
     "background_color": "#764ABC"
 }
