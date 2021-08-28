@@ -13,6 +13,8 @@ self.addEventListener('install', e => {
                 './images/apple-touch.png',
                 './images/splash-screen.png',
                 './scripts/camera.js',
+                './scripts/coco-ssd.js',
+                './scripts/tensorflow.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',
                 './views/home.handlebars'

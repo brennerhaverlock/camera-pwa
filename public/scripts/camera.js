@@ -1,100 +1,83 @@
-feather.replace();
-
-const controls = document.querySelector('.controls');
-const cameraOptions = document.querySelector('.video-options>select');
+const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
-const canvas = document.querySelector('canvas');
-const screenshotImage = document.querySelector('img');
-const buttons = [...controls.querySelectorAll('button')];
-let streamStarted = false;
-
+const buttons = [...cameraControls.querySelectorAll('button')];
 const [play, pause, screenshot] = buttons;
 
-const constraints = {
-  video: {
-    // width: {
-    //   min: 1280,
-    //   ideal: 1920,
-    //   max: 2560,
-    // },
-    // height: {
-    //   min: 720,
-    //   ideal: 1080,
-    //   max: 1440
-    // },
-    video: true,
-    facingMode: 'environment'
-  }
-};
+let cameraOn = false;
 
-cameraOptions.onchange = () => {
-  const updatedConstraints = {
-    ...constraints,
-    deviceId: {
-      exact: cameraOptions.value
-    }
-  };
+var model = undefined;
 
-  startStream(updatedConstraints);
-};
-
-play.onclick = () => {
-  if (streamStarted) {
-    video.play();
-    play.classList.add('d-none');
-    pause.classList.remove('d-none');
-    return;
-  }
-  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    const updatedConstraints = {
-      ...constraints,
-      deviceId: {
-        exact: cameraOptions.value
-      }
-    };
-    startStream(updatedConstraints);
-  }
-};
-
-const pauseStream = () => {
-  video.pause();
-  play.classList.remove('d-none');
-  pause.classList.add('d-none');
-};
-
-const doScreenshot = () => {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  screenshotImage.src = canvas.toDataURL('image/webp');
-  screenshotImage.classList.remove('d-none');
-};
-
-pause.onclick = pauseStream;
-screenshot.onclick = doScreenshot;
-
-const startStream = async (constraints) => {
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  handleStream(stream);
-};
-
-
-const handleStream = (stream) => {
-  video.srcObject = stream;
-  play.classList.add('d-none');
-  pause.classList.remove('d-none');
-  screenshot.classList.remove('d-none');
-
-};
-
-
-const getCameraSelection = async () => {
-  const devices = await navigator.mediaDevices.enumerateDevices();
-  const videoDevices = devices.filter(device => device.kind === 'videoinput');
-  const options = videoDevices.map(videoDevice => {
-    return `<option value="${videoDevice.deviceId}">${videoDevice.label}</option>`;
+cocoSsd.load().then(function (loadedModel) {
+    model = loadedModel;
   });
-  cameraOptions.innerHTML = options.join('');
-};
 
-getCameraSelection();
+// Start video when play button is clicked
+play.onclick = () => {
+    if (cameraOn == true) {
+        video.play();
+        return;
+    } 
+
+    // Check if camera exists. If it does, start video stream with set constraints
+    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+        const videoConstraints = { video: { facingMode: 'user'} }
+        startVideo(videoConstraints);
+    } else {
+        console.warn('getUserMedia() is not supported by this browser')
+    }
+}
+
+// Starts the video stream with input constraints, then displays it on the page
+const startVideo = async (constraints) => {
+    if (!model) {
+        return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+    video.srcObject = stream;
+    video.addEventListener('loadeddata', predictWebcam);
+}
+
+var children = [];
+
+function predictWebcam() {
+  // Now let's start classifying a frame in the stream.
+  model.detect(video).then(function (predictions) {
+    // Remove any highlighting we did previous frame.
+    for (let i = 0; i < children.length; i++) {
+      liveView.removeChild(children[i]);
+    }
+    children.splice(0);
+    
+    // Now lets loop through predictions and draw them to the live view if
+    // they have a high confidence score.
+    for (let n = 0; n < predictions.length; n++) {
+      // If we are over 66% sure we are sure we classified it right, draw it!
+      if (predictions[n].score > 0.66) {
+        const p = document.createElement('p');
+        p.innerText = predictions[n].class  + ' - with ' 
+            + Math.round(parseFloat(predictions[n].score) * 100) 
+            + '% confidence.';
+        p.style = 'margin-left: ' + predictions[n].bbox[0] + 'px; margin-top: '
+            + (predictions[n].bbox[1] - 10) + 'px; width: ' 
+            + (predictions[n].bbox[2] - 10) + 'px; top: 0; left: 0;';
+
+        const highlighter = document.createElement('div');
+        highlighter.setAttribute('class', 'highlighter');
+        highlighter.style = 'left: ' + predictions[n].bbox[0] + 'px; top: '
+            + predictions[n].bbox[1] + 'px; width: ' 
+            + predictions[n].bbox[2] + 'px; height: '
+            + predictions[n].bbox[3] + 'px;';
+
+        liveView.appendChild(highlighter);
+        liveView.appendChild(p);
+        children.push(highlighter);
+        children.push(p);
+      }
+    }
+    
+    // Call this function again to keep predicting when the browser is ready.
+    window.requestAnimationFrame(predictWebcam);
+  });
+}

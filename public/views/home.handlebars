@@ -1,20 +1,15 @@
 <h1 class="text-center">Camera PWA</h1>
 
-<div class="display-cover">
-    <video autoplay></video>
-    <canvas class="d-none"></canvas>
-
-    <div class="video-options">
-        <select name="" id="" class="custom-select">
-            <option value="">Select camera</option>
-        </select>
+<div>
+    <div id="liveView">
+        <video id="webcam" autoplay width="640" height="480"></video>
+        <canvas></canvas>
     </div>
 
-    <img class="screenshot-image d-none" alt="">
-
-    <div class="controls">
-        <button class="btn btn-danger play" title="Play"><i data-feather="play-circle"></i></button>
-        <button class="btn btn-info pause d-none" title="Pause"><i data-feather="pause"></i></button>
-        <button class="btn btn-outline-success screenshot d-none" title="ScreenShot"><i data-feather="image"></i></button>
+    <div class="video-controls">
+        <button title="Play">Play</button>
+        <button title="Pause">Pause</button>
+        <button title="Save">Save Image</button>
     </div>
+
 </div>
