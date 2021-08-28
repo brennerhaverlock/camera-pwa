@@ -27,7 +27,7 @@ app.use(require("./public/controllers/routes"));
 
 // Start server
 app.listen(port, () => {
-    console.log(`Weather App listening on ${port}`);
+    console.log(`Camera App listening on ${port}`);
 });
 
 module.exports = app;

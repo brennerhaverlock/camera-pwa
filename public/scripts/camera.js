@@ -10,6 +10,8 @@ let streamStarted = false;
 
 const [play, pause, screenshot] = buttons;
 
+console.log(navigator.mediaDevices.getUserMedia)
+
 const constraints = {
   video: {
     width: {
