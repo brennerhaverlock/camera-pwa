@@ -1,0 +1,17 @@
+{
+    "name": "Weather App PWA",
+    "short_name": "Weather App",
+    "description": "A weather app that can run offline maybe?",
+    "icons": [
+        {
+            "src": "/images/splash-screen.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ],
+    "start_url": "/",
+    "display": "fullscreen",
+    "theme_color": "#764ABC",
+    "background_color": "#764ABC"
+}
