@@ -46,7 +46,7 @@ function predictWebcam() {
   model.detect(video).then(function (predictions) {
     // Remove any highlighting we did previous frame.
     for (let i = 0; i < children.length; i++) {
-      liveView.removeChild(children[i]);
+      liveVideo.removeChild(children[i]);
     }
     children.splice(0);
     
@@ -70,8 +70,8 @@ function predictWebcam() {
             + predictions[n].bbox[2] + 'px; height: '
             + predictions[n].bbox[3] + 'px;';
 
-        liveView.appendChild(highlighter);
-        liveView.appendChild(p);
+        liveVideo.appendChild(highlighter);
+        liveVideo.appendChild(p);
         children.push(highlighter);
         children.push(p);
       }
