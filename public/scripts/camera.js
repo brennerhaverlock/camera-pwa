@@ -10,8 +10,6 @@ let streamStarted = false;
 
 const [play, pause, screenshot] = buttons;
 
-console.log(navigator.mediaDevices.getUserMedia)
-
 const constraints = {
   video: {
     width: {
@@ -24,6 +22,7 @@ const constraints = {
       ideal: 1080,
       max: 1440
     },
+    facingMode: 'environment'
   }
 };
 
