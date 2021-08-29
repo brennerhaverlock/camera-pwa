@@ -1,7 +1,9 @@
 const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
+const canvas = document.querySelector('canvas');
+const screenshot = document.querySelector('.save-image')
 const buttons = [...cameraControls.querySelectorAll('button')];
-const [play, pause, screenshot] = buttons;
+const [play, pause, saveImage] = buttons;
 
 let cameraOn = false;
 
@@ -37,6 +39,17 @@ const startVideo = async (constraints) => {
 
     video.srcObject = stream;
     video.addEventListener('loadeddata', predictWebcam);
+}
+
+pause.onclick = () => {
+  video.pause();
+}
+
+saveImage.onclick = () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+  screenshot.src = canvas.toDataURL('image/png');
 }
 
 var children = [];
