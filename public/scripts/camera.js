@@ -26,6 +26,7 @@ play.onclick = () => {
       .then( devices => {
         const cameras = devices.filter( device => device.kind === 'videoinput');
         const camera = cameras[cameras.length - 1];
+        console.log(camera.deviceId)
 
         const videoConstraints = {
           video: {
@@ -33,49 +34,13 @@ play.onclick = () => {
             facingMode: 'environment'
           }
         }
+
         startVideo(videoConstraints);
       })
     } else {
-      console.warn('getUserMedia() is not supported by this browser')
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
     }
-}
-
-flashlight.onclick = () => {
-  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.enumerateDevices()
-    .then( devices => {
-      const cameras = devices.filter( device => device.kind === 'videoinput')
-
-      let div = document.getElementById('error')
-      div.innerHTML += cameras[3].deviceId
-    })
-
-      // navigator.mediaDevices.getUserMedia({
-      //   video: {
-      //     facingMode: ['right', 'environment']
-      //   }
-      // })
-      // .then( stream => {
-      //   const track = stream.getVideoTracks()[0]
-      //   track.applyConstraints({
-      //     advanced: [{ torch: true }]
-      //   })
-      // })
-
-      // const imageCapture = new ImageCapture(track)
-      // imageCapture.getPhotoCapabilities()
-      // .then( res => {
-      //   const keys = Object.keys(res)
-      //   const values = Object.values(res)
-      //   console.log(keys)
-      //   console.log(values)
-      //   let div = document.getElementById('error')
-      //   div.innerHTML += keys
-      //   div.innerHTML += values
-
-      // })
-    // })
-  }
 }
 
 // Starts the video stream with input constraints, then displays it on the page
@@ -89,8 +54,13 @@ const startVideo = async (constraints) => {
 
     video.srcObject = stream;
     video.addEventListener('loadeddata', predictWebcam);
+
     track.applyConstraints({
-      advanced: [{torch: true}]
+      advanced: [{ torch: true }]
+    })
+    .catch( err => {
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.innerHTML += err
     })
 }
 
