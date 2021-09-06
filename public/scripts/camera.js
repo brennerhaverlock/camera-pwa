@@ -31,31 +31,35 @@ play.onclick = () => {
 
 flashlight.onclick = () => {
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.enumerateDevices()
-    .then( devices => {
-      const cameras = devices.filter( device => device.kind === 'videoinput')
-      const camera = cameras[cameras.length - 1]
-      console.log(camera)
-      let div = document.getElementById('error')
-      div.innerHTML += camera[0]
-    })
-    // navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} })
-    // .then( stream => {
-    //   const track = stream.getVideoTracks()[0]
-
-    //   const imageCapture = new ImageCapture(track)
-    //   imageCapture.getPhotoCapabilities()
-    //   .then( res => {
-    //     const keys = Object.keys(res)
-    //     const values = Object.values(res)
-    //     console.log(keys)
-    //     console.log(values)
-    //     let div = document.getElementById('error')
-    //     div.innerHTML += keys
-    //     div.innerHTML += values
-
-    //   })
+    // navigator.mediaDevices.enumerateDevices()
+    // .then( devices => {
+    //   const cameras = devices.filter( device => device.kind === 'videoinput')
+    //   // const camera = cameras[cameras.length]
+    //   console.log(cameras[0].deviceId)
+    //   let div = document.getElementById('error')
+    //   div.innerHTML += cameras[0].deviceId
     // })
+
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: ['user', 'environment'] } })
+    .then( stream => {
+      const track = stream.getVideoTracks()[0]
+      track.applyConstraints({
+        advanced: [{ torch: true }]
+      })
+
+      // const imageCapture = new ImageCapture(track)
+      // imageCapture.getPhotoCapabilities()
+      // .then( res => {
+      //   const keys = Object.keys(res)
+      //   const values = Object.values(res)
+      //   console.log(keys)
+      //   console.log(values)
+      //   let div = document.getElementById('error')
+      //   div.innerHTML += keys
+      //   div.innerHTML += values
+
+      // })
+    })
   }
 }
 
