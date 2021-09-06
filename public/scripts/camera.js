@@ -36,7 +36,10 @@ flashlight.onclick = () => {
       const cameras = devices.filter( device => device.kind === 'videoinput')
       console.log(cameras)
       let div = document.getElementById('error')
-      div.innerHTML += cameras.length
+      div.innerHTML += cameras[0].label
+      div.innerHTML += cameras[1].label
+      div.innerHTML += cameras[2].label
+      div.innerHTML += cameras[3].label
     })
     // navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} })
     // .then( stream => {
