@@ -36,7 +36,7 @@ flashlight.onclick = () => {
       const cameras = devices.filter( device => device.kind === 'videoinput')
 
       let div = document.getElementById('error')
-      div.innerHTML += cameras[2].deviceId
+      div.innerHTML += cameras[3].deviceId
     })
 
       // navigator.mediaDevices.getUserMedia({
