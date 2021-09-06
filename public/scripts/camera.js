@@ -90,7 +90,10 @@ const takePhoto = () => {
       .then( blob => {
         createImageBitmap(blob)
         .then( image => {
-          img.src = URL.createObjectURL(image)
+          const url = URL.createObjectURL(image);
+          const error = document.getElementById('errorMessage');
+          error.innerHTML += url
+          img.src = URL.createObjectURL(image);
         })
       })
     })
