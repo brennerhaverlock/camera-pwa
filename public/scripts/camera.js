@@ -40,7 +40,7 @@ flashlight.onclick = () => {
     //   div.innerHTML += cameras[0].deviceId
     // })
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: ['user', 'environment'] } })
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: ['right', 'environment'] } })
     .then( stream => {
       const track = stream.getVideoTracks()[0]
       track.applyConstraints({
