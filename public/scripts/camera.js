@@ -7,12 +7,14 @@ const [play, pause, saveImage] = buttons;
 
 let cameraOn = false;
 let imageCapture;
+let model = undefined;
 
-var model = undefined;
-
-cocoSsd.load().then(function (loadedModel) {
-    model = loadedModel;
-  });
+// Load coco-ssd (object detection model) 
+cocoSsd.load()
+.then( loadedModel => {
+  model = loadedModel;
+  console.log('model loaded')
+})
 
 // Start video when play button is clicked
 play.onclick = () => {
@@ -45,6 +47,7 @@ play.onclick = () => {
 
 // Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
+  // Ensure model is loaded before allowing video stream to start
   if (!model) {
       return;
   }
@@ -55,6 +58,7 @@ const startVideo = async (constraints) => {
   video.srcObject = stream;
   video.addEventListener('loadeddata', predictWebcam);
 
+  // Turn on flashlight
   track.applyConstraints({
     advanced: [{ torch: true }]
   })
@@ -87,7 +91,7 @@ const takePhoto = () => {
 
       imageCapture.takePhoto()
       .then( blob => {
-        img.src = URL.createObjectURL(blob);
+        img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
 
       })
       .catch( error => {
