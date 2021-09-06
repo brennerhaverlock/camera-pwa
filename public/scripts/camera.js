@@ -133,8 +133,6 @@ play.onclick = () => {
         video: {
           deviceId: camera.deviceId,
           facingMode: 'environment',
-          width: 720,
-          height: 1080,
         }
       }
 
