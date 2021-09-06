@@ -31,21 +31,28 @@ play.onclick = () => {
 
 flashlight.onclick = () => {
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    // navigator.mediaDevices.enumerateDevices()
-    // .then( devices => {
-    //   const cameras = devices.filter( device => device.kind === 'videoinput')
-    //   // const camera = cameras[cameras.length]
-    //   console.log(cameras[0].deviceId)
-    //   let div = document.getElementById('error')
-    //   div.innerHTML += cameras[0].deviceId
-    // })
+    navigator.mediaDevices.enumerateDevices()
+    .then( devices => {
+      const cameras = devices.filter( device => device.kind === 'videoinput')
 
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: ['right', 'environment'] } })
-    .then( stream => {
-      const track = stream.getVideoTracks()[0]
-      track.applyConstraints({
-        advanced: [{ torch: true }]
-      })
+      let div = document.getElementById('error')
+      div.innerHTML += cameras[0].deviceId
+      div.innerHTML += cameras[1].deviceId
+      div.innerHTML += cameras[2].deviceId
+      div.innerHTML += cameras[3].deviceId
+    })
+
+      // navigator.mediaDevices.getUserMedia({
+      //   video: {
+      //     facingMode: ['right', 'environment']
+      //   }
+      // })
+      // .then( stream => {
+      //   const track = stream.getVideoTracks()[0]
+      //   track.applyConstraints({
+      //     advanced: [{ torch: true }]
+      //   })
+      // })
 
       // const imageCapture = new ImageCapture(track)
       // imageCapture.getPhotoCapabilities()
