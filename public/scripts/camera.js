@@ -6,6 +6,7 @@ const buttons = [...cameraControls.querySelectorAll('button')];
 const [play, pause, saveImage] = buttons;
 
 let cameraOn = false;
+let imageCapture;
 
 var model = undefined;
 
@@ -26,7 +27,6 @@ play.onclick = () => {
     .then( devices => {
       const cameras = devices.filter( device => device.kind === 'videoinput');
       const camera = cameras[cameras.length - 1];
-      console.log(camera.deviceId)
 
       const videoConstraints = {
         video: {
@@ -43,7 +43,7 @@ play.onclick = () => {
   }
 }
 
-// Starts the video stream with input constraints, then displays it on the page
+// Function that starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
   if (!model) {
       return;
@@ -56,11 +56,63 @@ const startVideo = async (constraints) => {
   video.addEventListener('loadeddata', predictWebcam);
 
   track.applyConstraints({
-    advanced: [{ torch: true }]
+    advanced: [{ torch: false }]
   })
   .catch( err => {
     const errorMessage = document.getElementById('errorMessage');
     errorMessage.innerHTML += err
+  })
+}
+
+// const takePhoto = async () => {
+//   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+//   const track = stream.getVideoTracks()[0];
+//   imageCapture = new imageCapture(track);
+
+//   // const blob = await imageCapture.takePhoto({ fillLightMode: true });
+//   // const imageBitmap = await createImageBitmap(blob);
+//   // img.src = URL.createObjectURL(image)
+
+//   imageCapture.takePhoto({
+//     fillLightMode: true
+//   })
+//   .then( blob => {
+//     console.log(blob)
+//     createImageBitmap(blob)
+//     .then( imageBitmap => {
+//       img.src = URL.createObjectURL(image)
+//     })
+//   })
+//   .catch( error => {
+//     console.log(error)
+//   })
+// }
+
+const takePhoto = () => {
+  navigator.mediaDevices.getUserMedia({
+    video: true
+  })
+  .then( stream => {
+    video.srcObject = stream;
+
+    const track = stream.getVideoTracks()[0];
+    imageCapture = new ImageCapture(track);
+
+    imageCapture.takePhoto({
+      fillLightMode: true
+    })
+    .then( blob => {
+      console.log(blob)
+      createImageBitmap(blob)
+      .then( image => {
+        const url = URL.createObjectURL(image)
+        console.log(image)
+        img.src = URL.createObjectURL(image)
+      })
+    })
+  })
+  .catch( err => {
+    console.log(err)
   })
 }
 
@@ -71,10 +123,11 @@ pause.onclick = () => {
 
 // Save image when save image button is clicked
 saveImage.onclick = () => {
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  canvas.getContext('2d').drawImage(video, 0, 0);
-  screenshot.src = canvas.toDataURL('image/png');
+  takePhoto();
+  // canvas.width = video.videoWidth;
+  // canvas.height = video.videoHeight;
+  // canvas.getContext('2d').drawImage(video, 0, 0);
+  // screenshot.src = canvas.toDataURL('image/png');
 }
 
 var children = [];
