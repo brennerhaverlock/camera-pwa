@@ -57,7 +57,7 @@ const startVideo = async (constraints) => {
   video.addEventListener('loadeddata', predictWebcam);
 
   track.applyConstraints({
-    advanced: [{ torch: false }]
+    advanced: [{ torch: true }]
   })
   .catch( err => {
     const errorMessage = document.getElementById('errorMessage');
@@ -86,7 +86,7 @@ const takePhoto = () => {
       // Create new ImageCapture object which can be used to take a full resolution photo
       imageCapture = new ImageCapture(track);
 
-      imageCapture.takePhoto({ fillLightMode: 'flash' })
+      imageCapture.takePhoto()
       .then( blob => {
         img.src = URL.createObjectURL(blob);
 
