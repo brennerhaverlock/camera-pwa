@@ -66,7 +66,7 @@ flashlight.onclick = () => {
       //   div.innerHTML += values
 
       // })
-    })
+    // })
   }
 }
 
