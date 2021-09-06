@@ -3,7 +3,7 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const screenshot = document.querySelector('.save-image')
 const buttons = [...cameraControls.querySelectorAll('button')];
-const [play, pause, saveImage, flashlight] = buttons;
+const [play, pause, saveImage] = buttons;
 
 let cameraOn = false;
 
@@ -15,59 +15,61 @@ cocoSsd.load().then(function (loadedModel) {
 
 // Start video when play button is clicked
 play.onclick = () => {
-    if (cameraOn == true) {
-        video.play();
-        return;
-    } 
+  if (cameraOn == true) {
+      video.play();
+      return;
+  } 
 
-    // Check if camera exists. If it does, start video stream with set constraints
-    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-      navigator.mediaDevices.enumerateDevices()
-      .then( devices => {
-        const cameras = devices.filter( device => device.kind === 'videoinput');
-        const camera = cameras[cameras.length - 1];
-        console.log(camera.deviceId)
+  // Check if camera exists. If it does, start video stream with set constraints
+  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.enumerateDevices()
+    .then( devices => {
+      const cameras = devices.filter( device => device.kind === 'videoinput');
+      const camera = cameras[cameras.length - 1];
+      console.log(camera.deviceId)
 
-        const videoConstraints = {
-          video: {
-            deviceId: camera.deviceId,
-            facingMode: 'environment'
-          }
+      const videoConstraints = {
+        video: {
+          deviceId: camera.deviceId,
+          facingMode: 'environment'
         }
+      }
 
-        startVideo(videoConstraints);
-      })
-    } else {
-      const errorMessage = document.getElementById('errorMessage');
-      errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
-    }
+      startVideo(videoConstraints);
+    })
+  } else {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
+  }
 }
 
 // Starts the video stream with input constraints, then displays it on the page
 const startVideo = async (constraints) => {
-    if (!model) {
-        return;
-    }
+  if (!model) {
+      return;
+  }
 
-    const stream = await navigator.mediaDevices.getUserMedia(constraints);
-    const track = stream.getVideoTracks()[0]
+  const stream = await navigator.mediaDevices.getUserMedia(constraints);
+  const track = stream.getVideoTracks()[0]
 
-    video.srcObject = stream;
-    video.addEventListener('loadeddata', predictWebcam);
+  video.srcObject = stream;
+  video.addEventListener('loadeddata', predictWebcam);
 
-    track.applyConstraints({
-      advanced: [{ torch: true }]
-    })
-    .catch( err => {
-      const errorMessage = document.getElementById('errorMessage');
-      errorMessage.innerHTML += err
-    })
+  track.applyConstraints({
+    advanced: [{ torch: true }]
+  })
+  .catch( err => {
+    const errorMessage = document.getElementById('errorMessage');
+    errorMessage.innerHTML += err
+  })
 }
 
+// Pause video stream when pause button is clicked
 pause.onclick = () => {
   video.pause();
 }
 
+// Save image when save image button is clicked
 saveImage.onclick = () => {
   canvas.width = video.videoWidth;
   canvas.height = video.videoHeight;
