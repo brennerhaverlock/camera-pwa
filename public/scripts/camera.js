@@ -31,28 +31,30 @@ play.onclick = () => {
 
 flashlight.onclick = () => {
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} })
-    .then( stream => {
-      const track = stream.getVideoTracks()[0]
-
-      const imageCapture = new ImageCapture(track)
-      const capabilities = imageCapture.getPhotoCapabilities()
-      .then( res => {
-        // console.log(res)
-        const keys = Object.keys(res)
-        const values = Object.values(res)
-        console.log(keys)
-        console.log(values)
-        let div = document.getElementById('error')
-        div.innerHTML += keys
-        div.innerHTML += values
-
-      })
-      
-      track.applyConstraints({
-        advanced: [{ torch: true }]
-      })
+    navigator.mediaDevices.enumerateDevices()
+    .then( devices => {
+      const cameras = devices.filter( device => device.kind === 'videoinput')
+      console.log(cameras)
+      let div = document.getElementById('error')
+      div.innerHTML += cameras.length
     })
+    // navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} })
+    // .then( stream => {
+    //   const track = stream.getVideoTracks()[0]
+
+    //   const imageCapture = new ImageCapture(track)
+    //   imageCapture.getPhotoCapabilities()
+    //   .then( res => {
+    //     const keys = Object.keys(res)
+    //     const values = Object.values(res)
+    //     console.log(keys)
+    //     console.log(values)
+    //     let div = document.getElementById('error')
+    //     div.innerHTML += keys
+    //     div.innerHTML += values
+
+    //   })
+    // })
   }
 }
 
