@@ -5,10 +5,9 @@
     position: absolute;
 }
 
-/* #webcam {
+#webcam {
     width: 80%;
-    height: auto;
-} */
+}
 
 #liveVideo {
     position: relative;
