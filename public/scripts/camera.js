@@ -1,7 +1,6 @@
 const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
-const canvas = document.querySelector('canvas');
 const screenshot = document.querySelector('.save-image')
 const buttons = [...cameraControls.querySelectorAll('button')];
 const [play, pause, saveImage] = buttons;
@@ -106,10 +105,6 @@ pause.onclick = () => {
 // Save image when save image button is clicked
 saveImage.onclick = () => {
   takePhoto();
-  // canvas.width = video.videoWidth;
-  // canvas.height = video.videoHeight;
-  // canvas.getContext('2d').drawImage(video, 0, 0);
-  // screenshot.src = canvas.toDataURL('image/png');
 }
 
 var children = [];
