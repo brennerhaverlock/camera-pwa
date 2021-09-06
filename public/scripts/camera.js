@@ -64,57 +64,66 @@ const startVideo = async (constraints) => {
   })
 }
 
-// const takePhoto = async () => {
-//   const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-//   const track = stream.getVideoTracks()[0];
-//   imageCapture = new imageCapture(track);
-
-//   // const blob = await imageCapture.takePhoto({ fillLightMode: true });
-//   // const imageBitmap = await createImageBitmap(blob);
-//   // img.src = URL.createObjectURL(image)
-
-//   imageCapture.takePhoto({
-//     fillLightMode: true
-//   })
-//   .then( blob => {
-//     console.log(blob)
-//     createImageBitmap(blob)
-//     .then( imageBitmap => {
-//       img.src = URL.createObjectURL(image)
-//     })
-//   })
-//   .catch( error => {
-//     console.log(error)
-//   })
-// }
-
 const takePhoto = () => {
-  navigator.mediaDevices.getUserMedia({
-    video: true
-  })
-  .then( stream => {
-    video.srcObject = stream;
+  navigator.mediaDevices.enumerateDevices()
+  .then( devices => {
+    const cameras = devices.filter( device => device.kind === 'videoinput');
+    const camera = cameras[cameras.length - 1];
 
-    const track = stream.getVideoTracks()[0];
-    imageCapture = new ImageCapture(track);
+    const videoConstraints = {
+      video: {
+        deviceId: camera.deviceId,
+        facingMode: 'environment'
+      }
+    }
 
-    imageCapture.takePhoto({
-      fillLightMode: true
-    })
-    .then( blob => {
-      console.log(blob)
-      createImageBitmap(blob)
-      .then( image => {
-        const url = URL.createObjectURL(image)
-        console.log(image)
-        img.src = URL.createObjectURL(image)
+    navigator.mediaDevices.getUserMedia(videoConstraints)
+    .then( stream => {
+      video.srcObject = stream;
+
+      const track = stream.getVideoTracks()[0];
+      imageCapture = new ImageCapture(track);
+
+      imageCapture.takePhoto({
+        fillLightMode: true
+      })
+      .then( blob => {
+        createImageBitmap(blob)
+        .then( image => {
+          img.src = URL.createObjectURL(image)
+        })
       })
     })
   })
-  .catch( err => {
-    console.log(err)
-  })
 }
+
+// const takePhoto = () => {
+//   navigator.mediaDevices.getUserMedia({
+//     video: true
+//   })
+//   .then( stream => {
+//     video.srcObject = stream;
+
+//     const track = stream.getVideoTracks()[0];
+//     imageCapture = new ImageCapture(track);
+
+//     imageCapture.takePhoto({
+//       fillLightMode: true
+//     })
+//     .then( blob => {
+//       console.log(blob)
+//       createImageBitmap(blob)
+//       .then( image => {
+//         const url = URL.createObjectURL(image)
+//         console.log(image)
+//         img.src = URL.createObjectURL(image)
+//       })
+//     })
+//   })
+//   .catch( err => {
+//     console.log(err)
+//   })
+// }
 
 // Pause video stream when pause button is clicked
 pause.onclick = () => {
