@@ -33,6 +33,7 @@ flashlight.onclick = () => {
   if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} });
     const track = stream.getVideoTracks()[0];
+    console.log(track)
 
     track.applyConstraints({
       advanced: [{torch: true}]
