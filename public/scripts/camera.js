@@ -33,7 +33,9 @@ play.onclick = () => {
       const videoConstraints = {
         video: {
           deviceId: camera.deviceId,
-          facingMode: 'environment'
+          facingMode: 'environment',
+          width: 720,
+          height: 1080,
         }
       }
 
