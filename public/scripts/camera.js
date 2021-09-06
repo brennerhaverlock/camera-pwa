@@ -1,5 +1,6 @@
 const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
+const img = document.querySelector('img');
 const canvas = document.querySelector('canvas');
 const screenshot = document.querySelector('.save-image')
 const buttons = [...cameraControls.querySelectorAll('button')];
@@ -80,53 +81,22 @@ const takePhoto = () => {
     navigator.mediaDevices.getUserMedia(videoConstraints)
     .then( stream => {
       video.srcObject = stream;
-
       const track = stream.getVideoTracks()[0];
+
+      // Create new ImageCapture object which can be used to take a full resolution photo
       imageCapture = new ImageCapture(track);
 
-      imageCapture.takePhoto({
-        fillLightMode: true
-      })
+      imageCapture.takePhoto({ fillLightMode: 'flash' })
       .then( blob => {
-        createImageBitmap(blob)
-        .then( image => {
-          const url = URL.createObjectURL(image);
-          const error = document.getElementById('errorMessage');
-          error.innerHTML += url
-          img.src = URL.createObjectURL(image);
-        })
+        img.src = URL.createObjectURL(blob);
+
+      })
+      .catch( error => {
+        console.log(error)
       })
     })
   })
 }
-
-// const takePhoto = () => {
-//   navigator.mediaDevices.getUserMedia({
-//     video: true
-//   })
-//   .then( stream => {
-//     video.srcObject = stream;
-
-//     const track = stream.getVideoTracks()[0];
-//     imageCapture = new ImageCapture(track);
-
-//     imageCapture.takePhoto({
-//       fillLightMode: true
-//     })
-//     .then( blob => {
-//       console.log(blob)
-//       createImageBitmap(blob)
-//       .then( image => {
-//         const url = URL.createObjectURL(image)
-//         console.log(image)
-//         img.src = URL.createObjectURL(image)
-//       })
-//     })
-//   })
-//   .catch( err => {
-//     console.log(err)
-//   })
-// }
 
 // Pause video stream when pause button is clicked
 pause.onclick = () => {
