@@ -13,7 +13,7 @@ let model = undefined;
 cocoSsd.load()
 .then( loadedModel => {
   model = loadedModel;
-  console.log('model loaded')
+  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
 })
 
 // Start video when play button is clicked
