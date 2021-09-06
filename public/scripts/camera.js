@@ -22,7 +22,7 @@ play.onclick = () => {
 
     // Check if camera exists. If it does, start video stream with set constraints
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-        const videoConstraints = { video: { facingMode: 'environment'} }
+        const videoConstraints = { video: { facingMode: 'user'} }
         startVideo(videoConstraints);
     } else {
         console.warn('getUserMedia() is not supported by this browser')
@@ -49,7 +49,6 @@ flashlight.onclick = () => {
 
       })
       
-      let div = document.getElementById('error')
       track.applyConstraints({
         advanced: [{ torch: true }]
       })
