@@ -5,6 +5,11 @@
     position: absolute;
 }
 
+#webcam {
+    width: 80%;
+    height: auto;
+}
+
 #liveVideo {
     position: relative;
     float: left;
