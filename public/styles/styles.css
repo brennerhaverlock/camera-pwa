@@ -4,3 +4,21 @@
     z-index: 1;
     position: absolute;
 }
+
+.liveVideo {
+    position: relative;
+    float: left;
+    width: calc(100% - 20px);
+    margin: 10px;
+    cursor: pointer;
+  }
+  
+.liveVideo p {
+position: absolute;
+padding: 5px;
+background-color: rgba(255, 111, 0, 0.85);
+color: #FFF;
+border: 1px dashed rgba(255, 255, 255, 0.7);
+z-index: 2;
+font-size: 12px;
+}
