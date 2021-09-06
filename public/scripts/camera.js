@@ -22,16 +22,19 @@ play.onclick = () => {
 
     // Check if camera exists. If it does, start video stream with set constraints
     if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-      const cameras = devices.filter( device => device.kind === 'videoinput');
-      const camera = cameras[cameras.length - 1];
+      navigator.mediaDevices.enumerateDevices()
+      .then( devices => {
+        const cameras = devices.filter( device => device.kind === 'videoinput');
+        const camera = cameras[cameras.length - 1];
 
-      const videoConstraints = {
-        video: {
-          deviceId: camera.deviceId,
-          facingMode: 'environment'
+        const videoConstraints = {
+          video: {
+            deviceId: camera.deviceId,
+            facingMode: 'environment'
+          }
         }
-      }
-      startVideo(videoConstraints);
+        startVideo(videoConstraints);
+      })
     } else {
       console.warn('getUserMedia() is not supported by this browser')
     }
