@@ -3,7 +3,7 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const screenshot = document.querySelector('.save-image')
 const buttons = [...cameraControls.querySelectorAll('button')];
-const [play, pause, saveImage] = buttons;
+const [play, pause, saveImage, flashlight] = buttons;
 
 let cameraOn = false;
 
@@ -27,6 +27,18 @@ play.onclick = () => {
     } else {
         console.warn('getUserMedia() is not supported by this browser')
     }
+}
+
+flashlight.onclick = () => {
+  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment'} });
+    const track = stream.getVideoTracks()[0];
+
+    track.applyConstraints({
+      advanced: [{torch: true}]
+    })
+    console.log('turning on flashlight')
+  }
 }
 
 // Starts the video stream with input constraints, then displays it on the page
