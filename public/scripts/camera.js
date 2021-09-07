@@ -28,6 +28,7 @@ const startVideo = async (constraints) => {
   const track = stream.getVideoTracks()[0]
 
   video.srcObject = stream;
+  video.setAttribute("playsinline", true);
   video.addEventListener('loadeddata', predictWebcam);
 
   // Turn on flashlight
