@@ -147,7 +147,9 @@ play.onclick = () => {
 
 // Pause video stream when pause button is clicked
 pause.onclick = () => {
-  video.pause();
+  setTimeout( () => {
+    video.pause();
+  }, 2000)
 }
 
 // Save image when save image button is clicked
