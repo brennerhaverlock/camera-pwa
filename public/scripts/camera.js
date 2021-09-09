@@ -42,35 +42,77 @@ const startVideo = async (constraints) => {
 }
 
 // Function that can take a full resolution photo with the camera
+// const takePhoto = () => {
+//   navigator.mediaDevices.enumerateDevices()
+//   .then( devices => {
+//     const cameras = devices.filter( device => device.kind === 'videoinput');
+//     const camera = cameras[cameras.length - 1];
+
+//     const videoConstraints = {
+//       video: {
+//         deviceId: camera.deviceId,
+//         facingMode: 'environment'
+//       }
+//     }
+
+//     navigator.mediaDevices.getUserMedia(videoConstraints)
+//     .then( stream => {
+//       video.srcObject = stream;
+//       const track = stream.getVideoTracks()[0];
+
+//       // Create new ImageCapture object which can be used to take a full resolution photo
+//       imageCapture = new ImageCapture(track);
+
+//       imageCapture.takePhoto()
+//       .then( blob => {
+//         img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
+
+//       })
+//       .catch( error => {
+//         console.log(error)
+//       })
+//     })
+//   })
+// }
+
+// Function that can take a full resolution photo with the camera
 const takePhoto = () => {
-  navigator.mediaDevices.enumerateDevices()
-  .then( devices => {
-    const cameras = devices.filter( device => device.kind === 'videoinput');
-    const camera = cameras[cameras.length - 1];
-
-    const videoConstraints = {
-      video: {
-        deviceId: camera.deviceId,
-        facingMode: 'environment'
+  return new Promise( (resolve, reject) => {
+    navigator.mediaDevices.enumerateDevices()
+    .then( devices => {
+      const cameras = devices.filter( device => device.kind === 'videoinput');
+      const camera = cameras[cameras.length - 1];
+  
+      const videoConstraints = {
+        video: {
+          deviceId: camera.deviceId,
+          facingMode: 'environment'
+        }
       }
-    }
-
-    navigator.mediaDevices.getUserMedia(videoConstraints)
-    .then( stream => {
-      video.srcObject = stream;
-      const track = stream.getVideoTracks()[0];
-
-      // Create new ImageCapture object which can be used to take a full resolution photo
-      imageCapture = new ImageCapture(track);
-
-      imageCapture.takePhoto()
-      .then( blob => {
-        img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
-
+  
+      navigator.mediaDevices.getUserMedia(videoConstraints)
+      .then( stream => {
+        video.srcObject = stream;
+        const track = stream.getVideoTracks()[0];
+  
+        // Create new ImageCapture object which can be used to take a full resolution photo
+        imageCapture = new ImageCapture(track);
+  
+        imageCapture.takePhoto()
+        .then( blob => {
+          img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
+          resolve(blob)
+        })
+        .catch( error => {
+          reject(error)
+        })
       })
       .catch( error => {
-        console.log(error)
+        reject(error)
       })
+    })
+    .catch( error => {
+      reject(error)
     })
   })
 }
@@ -154,5 +196,9 @@ pause.onclick = () => {
 
 // Save image when save image button is clicked
 saveImage.onclick = () => {
-  takePhoto();
+  takePhoto()
+  .then( photo => {
+    window.localStorage.setItem('new_photo', photo)
+    console.log('photo saved in local storage')
+  })
 }
