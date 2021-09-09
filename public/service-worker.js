@@ -20,7 +20,8 @@ self.addEventListener('install', e => {
                 './scripts/tensorflow.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',
-                './views/home.handlebars'
+                './views/home.handlebars',
+                './views/show-photos.handlebars'
             ]);
         })
     );

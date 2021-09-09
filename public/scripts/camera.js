@@ -42,40 +42,6 @@ const startVideo = async (constraints) => {
 }
 
 // Function that can take a full resolution photo with the camera
-// const takePhoto = () => {
-//   navigator.mediaDevices.enumerateDevices()
-//   .then( devices => {
-//     const cameras = devices.filter( device => device.kind === 'videoinput');
-//     const camera = cameras[cameras.length - 1];
-
-//     const videoConstraints = {
-//       video: {
-//         deviceId: camera.deviceId,
-//         facingMode: 'environment'
-//       }
-//     }
-
-//     navigator.mediaDevices.getUserMedia(videoConstraints)
-//     .then( stream => {
-//       video.srcObject = stream;
-//       const track = stream.getVideoTracks()[0];
-
-//       // Create new ImageCapture object which can be used to take a full resolution photo
-//       imageCapture = new ImageCapture(track);
-
-//       imageCapture.takePhoto()
-//       .then( blob => {
-//         img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
-
-//       })
-//       .catch( error => {
-//         console.log(error)
-//       })
-//     })
-//   })
-// }
-
-// Function that can take a full resolution photo with the camera
 const takePhoto = () => {
   return new Promise( (resolve, reject) => {
     navigator.mediaDevices.enumerateDevices()
@@ -131,6 +97,7 @@ const predictWebcam = () => {
     // have a high confidence score
     for (let n = 0; n < predictions.length; n++ ) {
       if(predictions[n].score > 0.66) {
+        // Display name of object detected along with confidence score
         const p = document.createElement('p');
         p.innerText = predictions[n].class  + ' - with ' 
           + Math.round(parseFloat(predictions[n].score) * 100) 
@@ -139,6 +106,7 @@ const predictWebcam = () => {
           + (predictions[n].bbox[1] - 10) + 'px; width: ' 
           + (predictions[n].bbox[2] - 10) + 'px; top: 0; left: 0;';
 
+        // Draw box around detected object
         const highlighter = document.createElement('div');
         highlighter.setAttribute('class', 'highlighter');
         highlighter.style = 'left: ' + predictions[n].bbox[0] + 'px; top: '
@@ -185,14 +153,14 @@ play.onclick = () => {
     const errorMessage = document.getElementById('errorMessage');
     errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
   }
-}
+};
 
 // Pause video stream when pause button is clicked
 pause.onclick = () => {
   setTimeout( () => {
     video.pause();
   }, 2000)
-}
+};
 
 // Save image when save image button is clicked
 saveImage.onclick = () => {
@@ -201,4 +169,12 @@ saveImage.onclick = () => {
     window.localStorage.setItem('new_photo', photo)
     console.log('photo saved in local storage')
   })
-}
+  .catch( error => {
+    document.getElementById('errorMessage').innerHTML = `Error at :${error}`
+    console.log(error)
+  })
+};
+
+video.addEventListener('onvolumechange', e => {
+  takePhoto()
+});
