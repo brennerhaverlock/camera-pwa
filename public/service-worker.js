@@ -17,6 +17,8 @@ self.addEventListener('install', e => {
                 './images/splash-screen.png',
                 './scripts/camera.js',
                 './scripts/coco-ssd.js',
+                './scripts/idb-keyval.js',
+                './scripts/idb-keyval-fix.js',
                 './scripts/tensorflow.js',
                 './styles/styles.css',
                 './views/layouts/main.handlebars',

@@ -1,3 +1,5 @@
+import { get, set } from './idb-keyval.js';
+
 const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
@@ -9,6 +11,7 @@ let cameraOn = false;
 let imageCapture;
 let model = undefined;
 let children = [];
+let imageCount = 0;
 
 // Load coco-ssd (object detection model) 
 cocoSsd.load()
@@ -36,14 +39,18 @@ const startVideo = async (constraints) => {
     advanced: [{ torch: true }]
   })
   .catch( err => {
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.innerHTML += err
+    document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
   })
 }
 
 // Function that can take a full resolution photo with the camera
 const takePhoto = () => {
   return new Promise( (resolve, reject) => {
+    if (imageCount > 4) { // Number of photos to take before stopping
+      imageCount = 0;
+      return
+    }
+
     navigator.mediaDevices.enumerateDevices()
     .then( devices => {
       const cameras = devices.filter( device => device.kind === 'videoinput');
@@ -66,7 +73,7 @@ const takePhoto = () => {
   
         imageCapture.takePhoto()
         .then( blob => {
-          img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
+          // img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
           resolve(blob)
         })
         .catch( error => {
@@ -157,24 +164,20 @@ play.onclick = () => {
 
 // Pause video stream when pause button is clicked
 pause.onclick = () => {
-  setTimeout( () => {
-    video.pause();
-  }, 2000)
+  video.pause();
 };
 
-// Save image when save image button is clicked
 saveImage.onclick = () => {
-  takePhoto()
+  takePhoto() // Call function to take full res photo
   .then( photo => {
-    window.localStorage.setItem('new_photo', photo)
-    console.log('photo saved in local storage')
+    imageCount += 1;
+    set(`image${imageCount}`, photo) // Store image into IndexedDB 
+    setTimeout( () => {
+      document.getElementById('save-image').click(); // Delay 500ms, then take another photo
+    }, 500)
   })
   .catch( error => {
     document.getElementById('errorMessage').innerHTML = `Error at :${error}`
     console.log(error)
   })
-};
-
-video.addEventListener('onvolumechange', e => {
-  takePhoto()
-});
+}
