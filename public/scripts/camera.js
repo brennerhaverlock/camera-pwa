@@ -1,80 +1,113 @@
-import { get, set } from './idb-keyval.js';
+window.onload = function() {
+  const cameraControls = document.querySelector('.video-controls');
+  const video = document.querySelector('video');
+  const img = document.querySelector('img');
+  const screenshot = document.querySelector('.save-image')
+  // const buttons = [...cameraControls.querySelectorAll('button')];
+  // const [play, pause, saveImage, viewPhotos] = buttons;
+  const play = document.getElementById('play');
+  const pause = document.getElementById('pause');
+  const saveImage = document.getElementById('save-image');
+  const viewPhotos = document.getElementById('view');
 
-const cameraControls = document.querySelector('.video-controls');
-const video = document.querySelector('video');
-const img = document.querySelector('img');
-const screenshot = document.querySelector('.save-image')
-const buttons = [...cameraControls.querySelectorAll('button')];
-const [play, pause, saveImage] = buttons;
+  let cameraOn = false;
+  let imageCapture;
+  let model = undefined;
+  let children = [];
+  let imageCount = 0;
 
-let cameraOn = false;
-let imageCapture;
-let model = undefined;
-let children = [];
-let imageCount = 0;
+  // DATABASE SETUP
+  // Creates new database with the name 'image_db' and set version to 1
+  let openRequest = indexedDB.open('image_db', 1);
+  let db;
 
-// Load coco-ssd (object detection model) 
-cocoSsd.load()
-.then( loadedModel => {
-  model = loadedModel;
-  document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
-})
+  // Check if opened database already has an objectstore. If not, create one
+  openRequest.onupgradeneeded = event => {
+    let db = event.target.result; // assign opened databse to db variable
 
-// Function that starts the video stream with input constraints, then displays it on the page
-const startVideo = async (constraints) => {
-  // Ensure model is loaded before allowing video stream to start
-  if (!model) {
-      return;
-  }
+    // Create ObjectStore with the name 'images' and key set as 'name' if it doesn't already exist
+    if (!db.objectStoreNames.contains('images')) {
+      const storeOS = db.createObjectStore('images');
+    }
+  };
 
-  const stream = await navigator.mediaDevices.getUserMedia(constraints);
-  const track = stream.getVideoTracks()[0]
+  openRequest.onsuccess = event => {
+    console.log('db opened successfully');
+    db = event.target.result;
+  };
 
-  video.srcObject = stream;
-  video.setAttribute("playsinline", true);
-  video.addEventListener('loadeddata', predictWebcam);
+  openRequest.onerror = event => {
+    console.log(event)
+    document.getElementById('errorMessage').innerHTML = `Unable to open IndexedDB. Error message: ${event}`
+  };
 
-  // Turn on flashlight
-  track.applyConstraints({
-    advanced: [{ torch: true }]
+  // Load coco-ssd (object detection model) 
+  cocoSsd.load()
+  .then( loadedModel => {
+    model = loadedModel;
+    document.getElementById('information').innerHTML = 'Model has been loaded! You can now start the camera.'
   })
-  .catch( err => {
-    document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
-  })
-}
 
-// Function that can take a full resolution photo with the camera
-const takePhoto = () => {
-  return new Promise( (resolve, reject) => {
-    if (imageCount > 4) { // Number of photos to take before stopping
-      imageCount = 0;
-      return
+  // Function that starts the video stream with input constraints, then displays it on the page
+  const startVideo = async (constraints) => {
+    // Ensure model is loaded before allowing video stream to start
+    if (!model) {
+        return;
     }
 
-    navigator.mediaDevices.enumerateDevices()
-    .then( devices => {
-      const cameras = devices.filter( device => device.kind === 'videoinput');
-      const camera = cameras[cameras.length - 1];
-  
-      const videoConstraints = {
-        video: {
-          deviceId: camera.deviceId,
-          facingMode: 'environment'
-        }
+    const stream = await navigator.mediaDevices.getUserMedia(constraints);
+    const track = stream.getVideoTracks()[0]
+
+    video.srcObject = stream;
+    video.setAttribute("playsinline", true);
+    video.addEventListener('loadeddata', predictWebcam);
+
+    // Turn on flashlight
+    track.applyConstraints({
+      advanced: [{ torch: true }]
+    })
+    .catch( err => {
+      document.getElementById('errorMessage').innerHTML = `Unable to turn on flashlight. Error message: ${err}`
+    })
+  }
+
+  // Function that can take a full resolution photo with the camera
+  const takePhoto = () => {
+    return new Promise( (resolve, reject) => {
+      if (imageCount > 4) { // Number of photos to take before stopping
+        imageCount = 0;
+        document.getElementById('information').innerHTML = 'All images have been taken. Click <a href="/show-photos">HERE</a> to view them!'
+        return
       }
-  
-      navigator.mediaDevices.getUserMedia(videoConstraints)
-      .then( stream => {
-        video.srcObject = stream;
-        const track = stream.getVideoTracks()[0];
-  
-        // Create new ImageCapture object which can be used to take a full resolution photo
-        imageCapture = new ImageCapture(track);
-  
-        imageCapture.takePhoto()
-        .then( blob => {
-          // img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
-          resolve(blob)
+
+      navigator.mediaDevices.enumerateDevices()
+      .then( devices => {
+        const cameras = devices.filter( device => device.kind === 'videoinput');
+        const camera = cameras[cameras.length - 1];
+    
+        const videoConstraints = {
+          video: {
+            deviceId: camera.deviceId,
+            facingMode: 'environment'
+          }
+        }
+    
+        navigator.mediaDevices.getUserMedia(videoConstraints)
+        .then( stream => {
+          video.srcObject = stream;
+          const track = stream.getVideoTracks()[0];
+    
+          // Create new ImageCapture object which can be used to take a full resolution photo
+          imageCapture = new ImageCapture(track);
+    
+          imageCapture.takePhoto()
+          .then( blob => {
+            // img.src = URL.createObjectURL(blob); // Display captured photo in image tag on main page
+            resolve(blob)
+          })
+          .catch( error => {
+            reject(error)
+          })
         })
         .catch( error => {
           reject(error)
@@ -84,100 +117,118 @@ const takePhoto = () => {
         reject(error)
       })
     })
-    .catch( error => {
-      reject(error)
-    })
-  })
-}
+  }
 
-// Draws a frame around the subject based on confidence score returned by tensorflow
-const predictWebcam = () => {
-  // Now let's start classifying a frame in the stream.
-  model.detect(video)
-  .then( predictions => {
-    for (let i = 0; i < children.length; i++) {
-      liveVideo.removeChild(children[i]);
+  // Function that adds images to IndexedDB with a corresponding key
+  const addItem = (key, image) => {
+    let transaction = db.transaction('images', 'readwrite'); // create new transaction object from 'images' objectStore. allow read/write
+    let store = transaction.objectStore('images'); // 
+    let request = store.add(image, key);
+
+    request.onerror = event => {
+      console.log(event)
+      console.log('Error', event.target.error.name);
+    };
+
+    request.onsuccess = event => {
+      console.log('Item added to database successfully!')
     }
-    children.splice(0);
+  }
 
-    // Loop through predictions and draw them to the live view if they
-    // have a high confidence score
-    for (let n = 0; n < predictions.length; n++ ) {
-      if(predictions[n].score > 0.66) {
-        // Display name of object detected along with confidence score
-        const p = document.createElement('p');
-        p.innerText = predictions[n].class  + ' - with ' 
-          + Math.round(parseFloat(predictions[n].score) * 100) 
-          + '% confidence.';
-        p.style = 'margin-left: ' + predictions[n].bbox[0] + 'px; margin-top: '
-          + (predictions[n].bbox[1] - 10) + 'px; width: ' 
-          + (predictions[n].bbox[2] - 10) + 'px; top: 0; left: 0;';
-
-        // Draw box around detected object
-        const highlighter = document.createElement('div');
-        highlighter.setAttribute('class', 'highlighter');
-        highlighter.style = 'left: ' + predictions[n].bbox[0] + 'px; top: '
-          + predictions[n].bbox[1] + 'px; width: ' 
-          + predictions[n].bbox[2] + 'px; height: '
-          + predictions[n].bbox[3] + 'px;';
-
-        liveVideo.appendChild(highlighter);
-        liveVideo.appendChild(p);
-        children.push(highlighter);
-        children.push(p);
+  // Draws a frame around the subject based on confidence score returned by tensorflow
+  const predictWebcam = () => {
+    // Now let's start classifying a frame in the stream.
+    model.detect(video)
+    .then( predictions => {
+      for (let i = 0; i < children.length; i++) {
+        liveVideo.removeChild(children[i]);
       }
-    }
+      children.splice(0);
 
-    // Call this function again to keep predicting when the browser is ready.
-    window.requestAnimationFrame(predictWebcam);
-  });
-}
+      // Loop through predictions and draw them to the live view if they
+      // have a high confidence score
+      for (let n = 0; n < predictions.length; n++ ) {
+        if(predictions[n].score > 0.66) {
+          // Display name of object detected along with confidence score
+          const p = document.createElement('p');
+          p.innerText = predictions[n].class  + ' - with ' 
+            + Math.round(parseFloat(predictions[n].score) * 100) 
+            + '% confidence.';
+          p.style = 'margin-left: ' + predictions[n].bbox[0] + 'px; margin-top: '
+            + (predictions[n].bbox[1] - 10) + 'px; width: ' 
+            + (predictions[n].bbox[2] - 10) + 'px; top: 0; left: 0;';
 
-// Start video when play button is clicked
-play.onclick = () => {
-  if (cameraOn == true) {
-      video.play();
-      return;
-  } 
+          // Draw box around detected object
+          const highlighter = document.createElement('div');
+          highlighter.setAttribute('class', 'highlighter');
+          highlighter.style = 'left: ' + predictions[n].bbox[0] + 'px; top: '
+            + predictions[n].bbox[1] + 'px; width: ' 
+            + predictions[n].bbox[2] + 'px; height: '
+            + predictions[n].bbox[3] + 'px;';
 
-  // Check if camera exists. If it does, start video stream with set constraints
-  if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.enumerateDevices()
-    .then( devices => {
-      const cameras = devices.filter( device => device.kind === 'videoinput');
-      const camera = cameras[cameras.length - 1];
-
-      const videoConstraints = {
-        video: {
-          deviceId: camera.deviceId,
-          facingMode: 'environment',
+          liveVideo.appendChild(highlighter);
+          liveVideo.appendChild(p);
+          children.push(highlighter);
+          children.push(p);
         }
       }
 
-      startVideo(videoConstraints);
-    })
-  } else {
-    const errorMessage = document.getElementById('errorMessage');
-    errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
+      // Call this function again to keep predicting when the browser is ready.
+      window.requestAnimationFrame(predictWebcam);
+    });
   }
-};
 
-// Pause video stream when pause button is clicked
-pause.onclick = () => {
-  video.pause();
-};
+  // Start video when play button is clicked
+  play.onclick = () => {
+    if (cameraOn == true) {
+        video.play();
+        return;
+    } 
 
-saveImage.onclick = () => {
-  takePhoto() // Call function to take full res photo
-  .then( photo => {
-    imageCount += 1;
-    set(`image${imageCount}`, photo) // Store image into IndexedDB 
-    setTimeout( () => {
-      document.getElementById('save-image').click(); // Delay 500ms, then take another photo
-    }, 500)
-  })
-  .catch( error => {
-    document.getElementById('errorMessage').innerHTML = `Error at :${error}`
-    console.log(error)
-  })
+    // Check if camera exists. If it does, start video stream with set constraints
+    if ('mediaDevices' in navigator && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices.enumerateDevices()
+      .then( devices => {
+        const cameras = devices.filter( device => device.kind === 'videoinput');
+        const camera = cameras[cameras.length - 1];
+
+        const videoConstraints = {
+          video: {
+            deviceId: camera.deviceId,
+            facingMode: 'environment',
+          }
+        }
+
+        startVideo(videoConstraints);
+      })
+    } else {
+      const errorMessage = document.getElementById('errorMessage');
+      errorMessage.innerHTML += 'getUserMedia() is not supported by this browser.'
+    }
+  };
+
+  // Pause video stream when pause button is clicked
+  pause.onclick = () => {
+    // video.pause();
+    addItem('123', 'wow!');
+  };
+
+  viewPhotos.onclick = () => {
+    location.href = '/show-photos'
+  };
+
+  saveImage.onclick = () => {
+    takePhoto() // Call function to take full res photo
+    .then( photo => {
+      imageCount += 1;
+      addItem(`image${imageCount}`, photo) // Store image into IndexedDB
+      setTimeout( () => {
+        document.getElementById('save-image').click(); // Delay 500ms, then take another photo
+      }, 500)
+    })
+    .catch( error => {
+      document.getElementById('errorMessage').innerHTML = `Error at :${error}`
+      console.log(error)
+    })
+  };
 }
