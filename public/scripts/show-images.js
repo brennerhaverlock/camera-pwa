@@ -33,11 +33,3 @@ const getItem = () => {
 }
 
 getItem();
-// values()
-// .then( result => {
-//   for (let i = 0; i < result.length; i ++) {
-//       const img = document.createElement('IMG');
-//       img.src = URL.createObjectURL(result[i]);
-//       document.body.appendChild(img);
-//   }
-// })

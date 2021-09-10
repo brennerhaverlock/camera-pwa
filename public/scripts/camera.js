@@ -75,7 +75,7 @@ const takePhoto = () => {
   return new Promise( (resolve, reject) => {
     if (imageCount > 10) { // Number of photos to take before stopping
       imageCount = 0;
-      document.getElementById('information').innerHTML = 'All images have been taken. Click <a href="/show-photos">HERE</a> to view them!'
+      document.getElementById('information').innerHTML = 'All images have been taken. Click on the View Photos button to view them!'
       return
     }
 
