@@ -30,6 +30,8 @@ const isIos = () => {
   return /iphone|ipad|ipod/.test( userAgent );
 }
 
+const testing = isIos()
+document.getElementById('errorMessage').innerHTML = testing
 // Display install popup notification if iOS device is detected
 if (isIos() && !isInStandaloneMode()) {
   this.setState({ showInstallMessage: true });
