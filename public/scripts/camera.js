@@ -15,11 +15,9 @@ let imageCapture;
 let model = undefined;
 let children = [];
 let imageCount = 0;
-
 let deferredPrompt;
 
 window.addEventListener('beforeinstallprompt', e => {
-  console.log(e)
   deferredPrompt = e;
 })
 
@@ -259,6 +257,7 @@ viewPhotos.onclick = () => {
   getItem();
 };
 
+// Take full resolution images and save to the database
 saveImage.onclick = () => {
   takePhoto() // Call function to take full res photo
   .then( photo => {
@@ -274,6 +273,7 @@ saveImage.onclick = () => {
   })
 };
 
+// Install the PWA
 installApp.onclick = async () => {
   if (deferredPrompt !== null) {
     deferredPrompt.prompt();
