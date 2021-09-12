@@ -1,4 +1,4 @@
-const cameraControls = document.querySelector('.video-controls');
+// const cameraControls = document.querySelector('.video-controls');
 const video = document.querySelector('video');
 const img = document.querySelector('img');
 const screenshot = document.querySelector('.save-image')
@@ -17,9 +17,23 @@ let children = [];
 let imageCount = 0;
 let deferredPrompt;
 
+// Triggers browser to prompt user to install the PWA
+// Save event deferred event in case user doesn't take default install prompt
+// and wants to install at a later time. (Doesn't work on iOS)
 window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
-})
+});
+
+// Detect if device is running iOS
+const isIos = () => {
+  const userAgent = window.navigator.userAgent.toLowerCase();
+  return /iphone|ipad|ipod/.test( userAgent );
+}
+
+// Display install popup notification if iOS device is detected
+if (isIos() && !isInStandaloneMode()) {
+  this.setState({ showInstallMessage: true });
+}
 
 // DATABASE SETUP
 // Creates new database with the name 'image_db' and set version to 1
@@ -282,4 +296,4 @@ installApp.onclick = async () => {
       deferredPrompt = null;
     }
   }
-}
+};
