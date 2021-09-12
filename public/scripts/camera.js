@@ -8,12 +8,20 @@ const play = document.getElementById('play');
 const pause = document.getElementById('pause');
 const saveImage = document.getElementById('save-image');
 const viewPhotos = document.getElementById('view');
+const installApp = document.getElementById('installApp');
 
 let cameraOn = false;
 let imageCapture;
 let model = undefined;
 let children = [];
 let imageCount = 0;
+
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', e => {
+  console.log(e)
+  deferredPrompt = e;
+})
 
 // DATABASE SETUP
 // Creates new database with the name 'image_db' and set version to 1
@@ -265,3 +273,13 @@ saveImage.onclick = () => {
     console.log(error)
   })
 };
+
+installApp.onclick = async () => {
+  if (deferredPrompt !== null) {
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      deferredPrompt = null;
+    }
+  }
+}
