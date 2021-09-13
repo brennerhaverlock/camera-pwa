@@ -1,7 +1,6 @@
 {
   "name": "weather-app-pwa",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
@@ -10,8 +9,21 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-react-app": "^3.1.2",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "express-handlebars": "^5.3.3"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brennerhaverlock/camera-pwa.git"
+  },
+  "keywords": [],
+  "bugs": {
+    "url": "https://github.com/brennerhaverlock/camera-pwa/issues"
+  },
+  "homepage": "https://github.com/brennerhaverlock/camera-pwa#readme",
+  "description": ""
 }
