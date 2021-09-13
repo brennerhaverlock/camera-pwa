@@ -24,19 +24,19 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
 });
 
-// Detect if device is running iOS
-const isIos = () => {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return /iphone|ipad|ipod|/.test( userAgent );
-}
+// // Detect if device is running iOS
+// const isIos = () => {
+//   const userAgent = window.navigator.userAgent.toLowerCase();
+//   return /iphone|ipad|ipod|/.test( userAgent );
+// }
 
-const testing = isIos()
-document.getElementById('errorMessage').innerHTML = window.navigator.platform
+// const testing = isIos()
+// document.getElementById('errorMessage').innerHTML = window.navigator.platform
 
-// Display install popup notification if iOS device is detected
-if (isIos() && !isInStandaloneMode()) {
-  this.setState({ showInstallMessage: true });
-}
+// // Display install popup notification if iOS device is detected
+// if (isIos() && !isInStandaloneMode()) {
+//   this.setState({ showInstallMessage: true });
+// }
 
 // DATABASE SETUP
 // Creates new database with the name 'image_db' and set version to 1
